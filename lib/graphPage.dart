@@ -87,6 +87,7 @@ class _graphPageState extends State<graphPage> {
       ],
     );
   }
+
   Widget _buildGenreDropdown() {
     return DropdownButtonFormField<Genre>(
       value: _selectedGenre,
@@ -122,8 +123,10 @@ class _graphPageState extends State<graphPage> {
   Widget _buildGraph(List<Movie> movies) {
     // Filtrer les films par genre sélectionné
     final List<Movie> filteredMovies = _selectedGenre != null
-        ? movies.where((movie) => movie.genreIds.contains(_selectedGenre!.id)).toList()
-        : List.from(movies); // Copie la liste complète de films si aucun genre n'est sélectionné
+        ? movies.where((movie) => movie.genreIds.contains(_selectedGenre!.id))
+        .toList()
+        : List.from(
+        movies); // Copie la liste complète de films si aucun genre n'est sélectionné
 
     // Si la liste de films filtrée est vide, afficher un message avec un GIF
     if (filteredMovies.isEmpty) {
@@ -152,7 +155,8 @@ class _graphPageState extends State<graphPage> {
 
     // Appel de comparePopularityList avec la liste de films triée par popularité
     final List<charts.Series<Movie, String>> seriesList =
-    comparePopularityList(filteredMovies.reversed.toList()); // Inverser la liste pour afficher du moins populaire au plus populaire
+    comparePopularityList(filteredMovies.reversed
+        .toList()); // Inverser la liste pour afficher du moins populaire au plus populaire
 
     return charts.BarChart(
       seriesList,
@@ -160,11 +164,26 @@ class _graphPageState extends State<graphPage> {
       vertical: true,
       behaviors: [
         // Add an axis spec to specify a custom measure axis label.
-        charts.ChartTitle('Movies', behaviorPosition: charts.BehaviorPosition.bottom, titleOutsideJustification: charts.OutsideJustification.middleDrawArea),
-        charts.ChartTitle('Popularity', behaviorPosition: charts.BehaviorPosition.start, titleOutsideJustification: charts.OutsideJustification.middleDrawArea),
+        charts.ChartTitle(
+            'Movies', behaviorPosition: charts.BehaviorPosition.bottom,
+            titleOutsideJustification: charts.OutsideJustification
+                .middleDrawArea),
+        charts.ChartTitle(
+            'Popularity', behaviorPosition: charts.BehaviorPosition.start,
+            titleOutsideJustification: charts.OutsideJustification
+                .middleDrawArea),
         // Rotate the titles on domain axis.
-
       ],
+      domainAxis: charts.OrdinalAxisSpec(
+        renderSpec: charts.SmallTickRendererSpec(
+          labelRotation: 30, // Angle de rotation des étiquettes vers la droite (en degrés)
+          labelAnchor: charts.TickLabelAnchor.after, // Pour positionner les étiquettes au milieu de chaque barre
+          labelJustification: charts.TickLabelJustification.inside, // Aligner les étiquettes à l'intérieur des barres
+          minimumPaddingBetweenLabelsPx: 1, // Ajuster l'espacement entre les étiquettes
+          labelOffsetFromAxisPx: 10, // Ajuster l'espacement entre les étiquettes et l'axe des abscisses//
+          labelStyle: charts.TextStyleSpec(fontSize: 8),
+        ),
+      ),
     );
   }
 }
